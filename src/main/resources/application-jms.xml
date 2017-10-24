@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+   <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+    <property name="connectionFactory" ref="jmsFactory"></property>
+   <property name="defaultDestination" ref="destination"></property>
+   <property name = "messageConverter">
+   	 <bean class="org.springframework.jms.support.converter.SimpleMessageConverter"></bean>
+   </property>
+   </bean>
+   
+   <bean id="jmsFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+   		<property name="connectionFactory">
+   			<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+   				<property name="brokerURL" value="tcp://192.168.20.241:61626"></property>
+   			</bean>
+   		</property>
+   </bean>
+   
+   <bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
+   		<constructor-arg index="0" value="simple-queue" ></constructor-arg>
+   </bean>
+   
+   <bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+   <property name="connectionFactory" ref="jmsFactory"></property>
+   <property name="destination" ref="destination"> </property>
+   <property name="messageListener" ref="messageListener"></property>
+   </bean>
+   <bean id="messageListener" class="com.ju.jms.consumer.spring.SpringQueueListener"/>
+   </beans>
